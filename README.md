@@ -12,7 +12,7 @@ Synopsis
 
     use Brinstar::HTML ':all';
 
-    my $head = head(css => [qw(/file/a /file/b)]);
+    my $head = head(link => [qw(/file/a /file/b)]);
 
     my $body = body(p("It works!"));
 

@@ -300,16 +300,18 @@ my %specificities = (
                 },
             },
         map {$_ => {_neveralone => 1}} qw(
-                div
+                div span
                 dl dt dd
             )
     );
 
 foreach my $tag (@tags_mortal)
 {   no strict 'refs';
-    *{$tag} = sub { Brinstar::HTML::Tag->new(
-            {_tag => $tag, ($specificities{$tag} or ())},
-            @_)
+    *{$tag} = sub
+        {
+            Brinstar::HTML::Tag->new(
+                {_tag => $tag, %{$specificities{$tag} or {}}},
+                @_)
         }
 }
 
