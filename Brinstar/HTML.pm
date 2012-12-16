@@ -9,8 +9,8 @@ use Brinstar::HTML::Cookies;
 
 use base 'Exporter';
 
-my(@tags_magic) = qw(document html head br img script form hidden checkbox submit button Select textarea);
-my(@tags_mortal) = qw(body a p h1 h2 h3 div span pre ul li dl dt dd input label);
+my(@tags_magic) = qw(document html head br img script form hidden checkbox submit button Select textarea input password);
+my(@tags_mortal) = qw(body a p h1 h2 h3 div span pre ul li dl dt dd label);
 my(@tags_all) = (@tags_magic, @tags_mortal);
 
 my(@http_subs) = qw(http_header query_string serialize);
@@ -149,7 +149,7 @@ sub head
         for( all $self{script} ) {
             my %script = ref $_ eq 'HASH' ? %$_ : (src => $_);
             $script{type} ||= 'text/javascript';
-            push @head, Brinstar::HTML::Tag->new({_tag => 'script', %script});
+            push @head, Brinstar::HTML::Tag->new({_tag => 'script', _neveralone => 1, %script});
         }
     }
     if( exists $self{link} ) {
@@ -283,6 +283,23 @@ sub textarea {
             _tag => 'textarea',
             _neveralone => 1,
         }, "<![CDATA[$_]]>");
+}
+
+sub input {
+    Brinstar::HTML::Tag->new({
+            _tag => 'input',
+            type => 'text',
+            @_,
+        });
+}
+
+sub password {
+    Brinstar::HTML::Tag->new({
+            _tag => 'input',
+            _neveralone => 1,
+            type => 'password',
+            @_,
+        });
 }
 
 
