@@ -4,12 +4,14 @@ Brinstar::HTML
 Name
 ----
 
-CGI/HTML library to easily create HTML trees, manipulate them, manage sessions, cookies, and retrieve GET and POST values.
+CGI/HTML library to easily create HTML trees, manipulate them, manage sessions,
+cookies, and retrieve GET and POST values.
 
 
 Synopsis
 ---------
 
+    # HTML stuffs
     use Brinstar::HTML ':all';
 
     my $head = head(link => [qw(/file/a /file/b)]);
@@ -26,6 +28,25 @@ Synopsis
     warn Dumper($html);
 
 
+    # Session stuffs
+    use Brinstar::Session;
+    use Brinstar::Session::File;
+
+    my $session = Brinstar::Session->new;
+    print "Value $_ exists!" if ($_ = $session->{those});
+    $session{thing} = 1;
+
+    my $session = Brinstar::Session->create('PHPSESSID');
+    $session{that} = 0;
+
+    my $session = Brinstar::Session->get('TOTO');
+    if( $session ) {
+        print "Your are not logged on";
+    } else {
+        print "Hi $session->{display_name}";
+    }
+
+
 Features
 --------
 
@@ -33,11 +54,12 @@ Features
 * HTML tree creation
 * Base cookie management
 * Retrieve POST and GET values
+* Session management (and test)
 
 
 ### Coming Features
 * HTML tree search for children/ancestors
-* Session management
+* Test form HTML part
 
 
 Purpose
