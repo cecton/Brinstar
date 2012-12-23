@@ -1,15 +1,17 @@
+use 5.006;
+use strict;
+use warnings;
+
 package Brinstar::HTML;
 
-use warnings;
-use strict;
-use Carp;
-
 use Brinstar::HTML::Tag 'all';
-use Brinstar::HTML::Cookies;
+use Brinstar::Cookies;
+use Carp;
 
 use base 'Exporter';
 
-my(@tags_magic) = qw(document html head br img script form hidden checkbox submit button Select textarea input password);
+my(@tags_magic) = qw(document html head br img script form hidden checkbox
+                     submit button Select textarea input password);
 my(@tags_mortal) = qw(body a p h1 h2 h3 div span pre ul li dl dt dd label);
 my(@tags_all) = (@tags_magic, @tags_mortal);
 
@@ -32,10 +34,17 @@ sub serialize
         s/[^a-z0-9_ ]/sprintf('%%%x', ord($&))/gie;
         s/ /+/g;
     }
-    join('&', map {"$_=$data{$_}"} grep {m/=/ ? do {carp "Cannot serialize key `$_' and value `$data{$_}'!"; 0} : $_} keys %data);
+    join('&', map {"$_=$data{$_}"} grep {m/=/
+        ? do {carp "Cannot serialize key `$_' and value `$data{$_}'!"; 0}
+        : $_} keys %data);
 }
 
-sub query_string() { $ENV{QUERY_STRING} || serialize(map {m/^([^=]+)=(.+)$/ ? ($1 => $2) : die "Cannot convert argument $_ to key=value parameter!\n"} @ARGV) }
+sub query_string()
+{
+    $ENV{QUERY_STRING} || serialize(map {m/^([^=]+)=(.+)$/
+        ? ($1 => $2)
+        : die "Cannot convert argument $_ to key=value parameter!\n"} @ARGV)
+}
 
 
 
@@ -75,14 +84,17 @@ sub http_header
     }
     ## Special behaviors
     # Content type and charset
-    $o{'Content-Type'} =~ s/(;\s*)?charset=[^;]+|$/; charset=$o{Charset}/ if $o{Charset} and $o{'Content-Type'} =~ /text/;
+    $o{'Content-Type'} =~ s/(;\s*)?charset=[^;]+|$/; charset=$o{Charset}/
+        if $o{Charset} and $o{'Content-Type'} =~ /text/;
     delete $o{Charset};
     # Cookies
     if( $o{_nocookie} ) { delete $o{'Set-Cookie'} }
     else {
         my %cookies;
-        %cookies = &Brinstar::HTML::Cookies::get if not defined $o{'Set-Cookie'} or ref $o{'Set-Cookie'} ne 'HASH';
-        %cookies = (%cookies, %{$o{'Set-Cookie'}}) if ref $o{'Set-Cookie'} eq 'HASH';
+        %cookies = Brinstar::Cookies->get
+            if not defined $o{'Set-Cookie'} or ref $o{'Set-Cookie'} ne 'HASH';
+        %cookies = (%cookies, %{$o{'Set-Cookie'}})
+            if ref $o{'Set-Cookie'} eq 'HASH';
         $o{'Set-Cookie'} = join('; ',
             (map {"$_=$cookies{$_}"} keys %cookies),
             'path=/') if %cookies;
@@ -98,7 +110,8 @@ sub http_header
     values %o;
     while( my($k,$v) = each %o ) { next if $k =~ /^_/;
         if( ref($v) =~ m/^[A-Z_]+$/ ) {
-            carp "Can't handle HTTP header parameter $k (ref type is ".ref($v).")!";
+            carp "Can't handle HTTP header parameter $k (ref type is "
+                 .ref($v).")!";
             next;
         }
         $r .= "$k: $v\n";
@@ -137,19 +150,27 @@ sub head
                 $meta{content} ||= 'text/html';
             }
             unless( $meta{content} =~ m/\bcharset=/ ) {
-                $meta{content} .= '; charset='.(delete($meta{charset}) || 'utf-8');
+                $meta{content} .= '; charset='
+                                  .(delete($meta{charset}) || 'utf-8');
             }
             push @head, Brinstar::HTML::Tag->new({_tag => 'meta', %meta});
         }
     } else {
-        push @head, Brinstar::HTML::Tag->new({_tag => 'meta',
-                        content => 'text/html; charset=utf-8', 'http-equiv' => 'Content-Type'});
+        push @head, Brinstar::HTML::Tag->new({
+                _tag => 'meta',
+                content => 'text/html; charset=utf-8',
+                'http-equiv' => 'Content-Type'
+            });
     }
     if( exists $self{script} ) {
         for( all $self{script} ) {
             my %script = ref $_ eq 'HASH' ? %$_ : (src => $_);
             $script{type} ||= 'text/javascript';
-            push @head, Brinstar::HTML::Tag->new({_tag => 'script', _neveralone => 1, %script});
+            push @head, Brinstar::HTML::Tag->new({
+                    _tag => 'script',
+                    _neveralone => 1,
+                    %script,
+                });
         }
     }
     if( exists $self{link} ) {
@@ -166,10 +187,14 @@ sub head
         for( all $self{style} ) {
             s/^\s+|\s+$//g;
             next unless $_;
-            push @head, Brinstar::HTML::Tag->new({_tag => 'style', type => 'text/css'}, $_);
+            push @head, Brinstar::HTML::Tag->new({
+                    _tag => 'style',
+                    type => 'text/css',
+                }, $_);
         }
     }
-    push @head, Brinstar::HTML::Tag->new({_tag => 'title'}, exists $self{title} ? $self{title} : $0);
+    push @head, Brinstar::HTML::Tag->new({_tag => 'title'},
+        exists $self{title} ? $self{title} : $0);
     Brinstar::HTML::Tag->new({_tag => 'head'}, @head);
 }
 
@@ -269,7 +294,8 @@ sub Select
                             selected => $select{_default} eq $_,
                         }, $_)} @$values;
                 } else {
-                    carp "Invalid values type for tag HTML <select>: ".(ref($values) or "not a reference");
+                    carp "Invalid values type for tag HTML <select>: ".
+                         (ref($values) or "not a reference");
                     ();
                 }
             } else { () }

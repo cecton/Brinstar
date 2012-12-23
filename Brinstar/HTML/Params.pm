@@ -23,7 +23,8 @@ sub read {
         else { $gets{$_} = 1 }
     }
     ## Read posted values
-    if( $ENV{CONTENT_TYPE} and $ENV{CONTENT_TYPE} =~ m/(\S+)\s*;\s*boundary=(\S+)/ ) {
+    if( $ENV{CONTENT_TYPE} and
+            $ENV{CONTENT_TYPE} =~ m/(\S+)\s*;\s*boundary=(\S+)/ ) {
         #my $content_type = $1; ##NOT USED
         local $/ = "--$2";
         while( <STDIN> ) {
@@ -48,7 +49,9 @@ sub read {
 
 sub get {
     &read unless $read;
-    @_ > 1 ? map {$posts{$_} || $gets{$_}} @_ : @_ == 1 ? $posts{$_[0]} || $gets{$_[0]} : (%gets, %posts)
+    @_ > 1 ? map {$posts{$_} || $gets{$_}} @_ : @_ == 1
+        ? $posts{$_[0]} || $gets{$_[0]}
+        : (%gets, %posts)
 }
 
 sub gets {

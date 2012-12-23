@@ -28,7 +28,8 @@ sub new {
         if( ref $_ eq 'HASH' ) {
             while( my($k,$v) = each %$_ ) {
                 if( exists $self->{$k} and $k eq 'class' ) {
-                    $self->{$k} = [(ref $self->{$k} eq 'ARRAY' ? @{$self->{$k}} : $self->{$k}), $v];
+                    $self->{$k} = [(ref $self->{$k} eq 'ARRAY'
+                        ? @{$self->{$k}} : $self->{$k}), $v];
                 } else { $self->{$k} = $v }
             }
         } else {
@@ -41,8 +42,11 @@ sub new {
     bless $self, $class;
 }
 
-## Get all values of ref if its a ref, remove not defined, get strings and remove empty strings
-sub _compute { defined $_[1] ? grep {$_} map {"$_"} grep {defined $_} all $_[1] : () }
+# Get all values of ref if its a ref, remove not defined,
+# get strings and remove empty strings
+sub _compute { defined $_[1]
+               ? grep {$_} map {"$_"} grep {defined $_} all $_[1]
+               : () }
 
 sub str {
     my $self = shift;
@@ -63,7 +67,8 @@ sub str {
         } elsif( $self->{_flags}->{$attr} ) {
             $attributes .= " $attr" if $self->{$attr};
         } else {
-            $attributes .= " $attr=\"".join(' ', grep {$_} all($self->{$attr})).'"';
+            $attributes .= " $attr=\""
+                           .join(' ', grep {$_} all($self->{$attr})).'"';
         }
     }
     my $r = '<'.$tag.$attributes;
