@@ -1,10 +1,10 @@
-Brinstar::HTML
-==============
+Brinstar
+========
 
 Name
 ----
 
-CGI/HTML library to easily create HTML trees, manipulate them, manage sessions,
+Perl CGI/HTML library to easily create HTML trees, manipulate them, manage sessions,
 cookies, and retrieve GET and POST values.
 
 
@@ -59,7 +59,7 @@ Features
 
 ### Coming Features
 * HTML tree search for children/ancestors
-* Test form HTML part
+* Test for HTML part
 
 
 Purpose
