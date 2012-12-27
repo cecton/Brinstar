@@ -41,9 +41,9 @@ Synopsis
 
     my $session = Brinstar::Session->get('TOTO');
     if( $session ) {
-        print "Your are not logged on";
-    } else {
         print "Hi $session->{display_name}";
+    } else {
+        print "Your are not logged on";
     }
 
 
@@ -59,7 +59,8 @@ Features
 
 ### Coming Features
 * HTML tree search for children/ancestors
-* Test for HTML part
+* Tests for HTML part
+* DBI driver for sessions
 
 
 Purpose
