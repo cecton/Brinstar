@@ -64,16 +64,22 @@ sub create
             $id = uuid;
             $sth->execute($id);
             $_ = $sth->fetchrow_arrayref;
-            $sth->finish;
         }
-        return undef if $tries == -1;
+        if( $tries == -1 ) {
+            warn "Cannot find an available unique id for session creation!\n";
+            return undef 
+        }
     }
 
     $sth = $dbh->prepare_cached("INSERT INTO $table (id, data) VALUES (?, ?)");
-    unless( $sth->execute($id, Dumper($session)) or not $insert_must_succeed )
-    {
+    if( $insert_must_succeed and not $sth->execute($id, Dumper($session)) ) {
         warn "Bug: cannot insert new session row id $id\n";
         return undef;
+    } else {
+        local $SIG{__WARN__} = sub {
+            warn @_ unless $_[0] =~ m/^DBD::\S+ execute failed:/;
+        };
+        $sth->execute($id, Dumper($session));
     }
 
     $ids{"$session"} = $id;
