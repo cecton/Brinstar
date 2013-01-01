@@ -55,12 +55,12 @@ Features
 * Base cookie management
 * Retrieve POST and GET values
 * Session management (and test)
+* DBI driver for sessions
 
 
 ### Coming Features
 * HTML tree search for children/ancestors
 * Tests for HTML part
-* DBI driver for sessions
 
 
 Purpose
