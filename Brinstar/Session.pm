@@ -87,8 +87,7 @@ sub DESTROY
 sub delete
 {
     my $self = shift;
-    my $id = delete $ids{"$self"};
-    delete $sessions{$id};
+    $_ = delete $ids{"$self"} and delete $sessions{$_};
     delete $autosave{"$self"};
     &$delete_func($self) if $delete_func;
 }

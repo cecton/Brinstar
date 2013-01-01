@@ -2,7 +2,7 @@ use 5.006;
 use strict;
 use warnings;
 
-package Brinstar::Session::Test::Default;
+package Brinstar::Session::Test::File;
 
 use Test::More tests => 14;
 use Data::Dumper;
@@ -52,11 +52,12 @@ $session->{test} = 1;
 undef $session;
 $session = new_ok('Brinstar::Session',
                   [name => $cookie_name]);
-ok(not (exists $session->{test}), "inexistence of session file");
+ok(not (exists $session->{test}), "inexistence of session value");
 
 # Create a session with specified id
 my $session1 = Brinstar::Session->create(name => $cookie_name, id => "TEST_ID");
 my $session2 = Brinstar::Session->get(name => $cookie_name, id => "TEST_ID");
-ok((defined $session2 and $session1 eq $session2), 'Second session created with same id should match first one');
+ok(defined $session2 && $session1 eq $session2,
+    'Second session created with same id should match first one');
 
 1;
