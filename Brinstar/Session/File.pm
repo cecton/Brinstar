@@ -25,7 +25,7 @@ sub create
     local $Data::Dumper::Terse = 1;
 
     my($session,$id) = @_;
-    make_path($tmpdir, mode => 0700);
+    make_path($tmpdir, {mode => 0700});
     my $file;
     if( $id ) { $file = join('/', $tmpdir, $id) }
     else { $file = join('/', $tmpdir, $id = uuid) while not $file or -f $file }
