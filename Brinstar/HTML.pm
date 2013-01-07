@@ -68,7 +68,12 @@ sub http_header
     elsif( @_ == 2 and $_[0] =~ /\// and $_[1] =~ /^\d+/ ) {
         %o = (%o, type => $_[0], status => $_[1]);
     } else { %o = (%o, @_) }
-    ## Cleaning up parameters
+    # Redirection
+    if( $_ = delete $o{redirect} ) {
+        $o{Status} = "302 Found";
+        $o{Location} = $_;
+    }
+    # Clean up parameters
     while( my($k,$v) = each %o ) { next if $k =~ /^_/;
         if( ref $v eq 'ARRAY' ) {
             @$v = grep {$_} @$v;
@@ -82,8 +87,7 @@ sub http_header
         s/\b[a-z]/uc $&/ge if not $_ and $_ = $k;
         $o{$_} = delete $o{$k} if $_ ne $k;
     }
-    ## Special behaviors
-    # Content type and charset
+    # Special behavior for content type and charset
     $o{'Content-Type'} =~ s/(;\s*)?charset=[^;]+|$/; charset=$o{Charset}/
         if $o{Charset} and $o{'Content-Type'} =~ /text/;
     delete $o{Charset};
@@ -99,7 +103,7 @@ sub http_header
             (map {"$_=$cookies{$_}"} keys %cookies),
             'path=/') if %cookies;
     }
-    # Languages
+    # Special behavior for content language
     $o{'Content-Language'} ||= $ENV{LANGUAGE} if $ENV{LANGUAGE};
     #TODO dont know how language show multiple languages...
     #if( ref $o{'Content-Language'} eq 'ARRAY' ) {

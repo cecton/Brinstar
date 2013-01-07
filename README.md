@@ -14,15 +14,15 @@ Synopsis
     # HTML stuffs
     use Brinstar::HTML ':all';
 
-    my $head = head(link => [qw(/file/a /file/b)]);
+    my $head = head(link => [qw(/css/my_stylesheet.css /file/b)]);
 
     my $body = body(p("It works!"));
 
     my $html = html($head, $body);
 
     my $document = document($html);
+    print http_header();
     print $document;
-    print http_header(), $document;
 
     use Data::Dumper;
     warn Dumper($html);
@@ -36,10 +36,10 @@ Synopsis
     print "Value $_ exists!" if ($_ = $session->{those});
     $session{thing} = 1;
 
-    my $session = Brinstar::Session->create('PHPSESSID');
+    my $session = Brinstar::Session->create(name => 'PHPSESSID');
     $session{that} = 0;
 
-    my $session = Brinstar::Session->get('TOTO');
+    my $session = Brinstar::Session->get(id => 'TOTO');
     if( $session ) {
         print "Hi $session->{display_name}";
     } else {
