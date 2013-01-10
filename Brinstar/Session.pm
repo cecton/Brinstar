@@ -9,7 +9,7 @@ use Data::Dumper;
 use Data::UUID::MT;
 use base 'Exporter';
 
-use Brinstar::Cookies;
+use Brinstar::HTTP::Cookies ':all';
 
 our @EXPORT_OK = qw/uuid/;
 
@@ -51,7 +51,7 @@ sub create
     $autosave{"$session"} = 1 if $o{autosave};
     weaken($sessions{$id} = $session);
     $ids{"$session"} = $id;
-    Brinstar::Cookies->set($o{name} => $id);
+    set_cookies($o{name} => $id);
     $session;
 }
 
@@ -59,7 +59,7 @@ sub get
 {
     my $class = shift;
     my %o = (name => $default_cookie_name, autosave => 1, @_);
-    my $id = $o{id} || Brinstar::Cookies->get($o{name});
+    my $id = $o{id} || get_cookies($o{name});
     return undef unless $id;
     my $session = $sessions{$id} || &$get_func($id);
     if( $session ) {

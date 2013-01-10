@@ -1,31 +1,33 @@
-package Brinstar::HTML::Params;
-
+use 5.006;
 use strict;
 use warnings;
 
-use Brinstar::HTML 'query_string';
+package Brinstar::HTTP::Params;
+
+use Brinstar::HTTP::Serializer ':all';
+
+use base 'Exporter';
+our(@EXPORT_OK) = qw(params params_get params_post);
+our(%EXPORT_TAGS) = (
+        'all' => \@EXPORT_OK,
+    );
 
 our $read;
 our %gets;
 our %posts;
 
-sub new { bless {}, $_[0] }
-
-sub read {
-    #warn "read=".($read || 'no');
-    ## Read parameters
-    for( split /&/, query_string ) {
-        s/%([0-9a-f][0-9a-f])/chr(hex($1))/gei;
-        if( /^([^=]+)=(.+)$/ ) {
-            my($k,$v) = ($1,$2);
-            $gets{$k} = $v;
-        }
-        else { $gets{$_} = 1 }
-    }
-    ## Read posted values
+sub read()
+{
+    # Read parameters
+    %gets = unserialize(query_string);
+    # Read posted values
     if( $ENV{CONTENT_TYPE} and
+            $ENV{CONTENT_TYPE} eq 'application/x-www-form-urlencoded' ) {
+        local $/;
+        %posts = unserialize(<STDIN>);
+    } elsif( $ENV{CONTENT_TYPE} and
             $ENV{CONTENT_TYPE} =~ m/(\S+)\s*;\s*boundary=(\S+)/ ) {
-        #my $content_type = $1; ##NOT USED
+        #my $content_type = $1; # NOT USED
         local $/ = "--$2";
         while( <STDIN> ) {
                 $_ = substr($_, 0, length($_) - length($/));
@@ -47,19 +49,22 @@ sub read {
     $read = 1;
 }
 
-sub get {
+sub params
+{
     &read unless $read;
     @_ > 1 ? map {$posts{$_} || $gets{$_}} @_ : @_ == 1
         ? $posts{$_[0]} || $gets{$_[0]}
         : (%gets, %posts)
 }
 
-sub gets {
+sub params_get
+{
     &read unless $read;
     @_ > 1 ? map {$gets{$_}} @_ : @_ == 1 ? $gets{$_[0]} : %gets
 }
 
-sub posts {
+sub params_post
+{
     &read unless $read;
     @_ > 1 ? map {$posts{$_}} @_ : @_ == 1 ? $posts{$_[0]} : %posts
 }
