@@ -4,7 +4,7 @@ use warnings;
 
 package Brinstar::Session::Test::File;
 
-use Test::More tests => 14;
+use Test::More tests => 16;
 use Data::Dumper;
 
 my $cookie_name = "Toto";
@@ -55,9 +55,11 @@ $session = new_ok('Brinstar::Session',
 ok(not (exists $session->{test}), "inexistence of session value");
 
 # Create a session with specified id
-my $session1 = Brinstar::Session->create(name => $cookie_name, id => "TEST_ID");
-my $session2 = Brinstar::Session->get(name => $cookie_name, id => "TEST_ID");
+my $session1 = Brinstar::Session->create(name => $cookie_name, id => 'TEST_ID');
+my $session2 = Brinstar::Session->get(name => $cookie_name, id => 'TEST_ID');
+ok($session1->id eq 'TEST_ID', "Session id match (1)");
+ok($session2->id eq 'TEST_ID', "Session id match (2)");
 ok(defined $session2 && $session1 eq $session2,
-    'Second session created with same id should match first one');
+    "Second session created with same id should match first one");
 
 1;

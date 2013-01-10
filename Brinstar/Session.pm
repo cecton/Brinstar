@@ -76,6 +76,8 @@ sub write
     &$write_func($self);
 }
 
+sub id() { $ids{shift()} }
+
 sub DESTROY
 {
     my $self = shift;
