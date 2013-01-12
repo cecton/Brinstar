@@ -7,11 +7,13 @@ package Brinstar::Session;
 use Scalar::Util qw/weaken/;
 use Data::Dumper;
 use Data::UUID::MT;
-use base 'Exporter';
 
 use Brinstar::HTTP::Cookies ':all';
 
+use base 'Exporter';
 our @EXPORT_OK = qw/uuid/;
+
+our $DEBUG;
 
 our $default_cookie_name = __PACKAGE__;
 our $create_func = sub {
@@ -45,7 +47,7 @@ sub create
     my $class = shift;
     my %o = (name => $default_cookie_name, autosave => 1, @_);
     my $session = bless {}, $class;
-    my $id = &$create_func($session, $o{id});
+    my $id = &$create_func($session, $DEBUG ? 'DEBUG' : $o{id});
     die "Didn't succeed session creation!\n"
         unless defined $id;
     $autosave{"$session"} = 1 if $o{autosave};
@@ -59,7 +61,7 @@ sub get
 {
     my $class = shift;
     my %o = (name => $default_cookie_name, autosave => 1, @_);
-    my $id = $o{id} || get_cookies($o{name});
+    my $id = $o{id} || get_cookies($o{name}) || ($DEBUG ? 'DEBUG' : undef);
     return undef unless $id;
     my $session = $sessions{$id} || &$get_func($id);
     if( $session ) {
