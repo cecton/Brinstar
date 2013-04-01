@@ -138,19 +138,23 @@ sub checkbox
 
 sub submit
 {
+    my @values = grep {not ref} @_;
     Brinstar::HTML::Tag->new({
             _tag => 'input',
             type => 'submit',
-            value => @_ ? join(' ', @_) : undef,
+            value => @values ? join(' ', @values) : undef,
+            map {%$_} grep {ref eq 'HASH'} @_,
         });
 }
 
 sub button
 {
+    my @values = grep {not ref} @_;
     Brinstar::HTML::Tag->new({
             _tag => 'input',
             type => 'button',
-            value => join(' ', @_),
+            value => @values ? join(' ', @values) : undef,
+            map {%$_} grep {ref eq 'HASH'} @_,
         });
 }
 
